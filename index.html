@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>English Master AI - Hoa Khuong 2</title>
+    <style>
+        :root { --blue: #0056b3; --orange: #f3722c; --green: #28a745; --bg: #f0f7ff; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); margin: 0; padding: 15px; }
+        .container { max-width: 800px; margin: auto; background: white; padding: 25px; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        h1 { text-align: center; color: var(--blue); font-size: 22px; margin-bottom: 20px; }
+        .setup-box { background: #f8fbff; padding: 15px; border-radius: 15px; border: 1px solid #d1e3f8; margin-bottom: 20px; }
+        select, input { width: 100%; padding: 12px; margin: 8px 0; border-radius: 10px; border: 2px solid #cfe0f3; font-size: 16px; box-sizing: border-box; }
+        .chat-box { min-height: 250px; background: #fff; border: 2px solid #e2e8f0; border-radius: 20px; padding: 20px; display: flex; flex-direction: column; align-items: center; text-align: center; margin-bottom: 20px; justify-content: center; }
+        .ai-msg { font-size: 24px; color: var(--blue); font-weight: bold; line-height: 1.4; margin-bottom: 15px; }
+        .user-msg { font-size: 18px; color: #666; font-style: italic; border-top: 1px solid #eee; padding-top: 10px; width: 100%; }
+        .btn-speak { width: 100%; padding: 18px; border: none; border-radius: 50px; font-size: 20px; font-weight: bold; cursor: pointer; background: var(--blue); color: white; box-shadow: 0 8px 20px rgba(0,86,179,0.3); transition: 0.3s; }
+        .recording { background: #d90429 !important; animation: pulse 1s infinite; }
+        .feedback-area { background: #fff9e6; padding: 15px; border-radius: 15px; margin-top: 15px; display: none; border: 1px solid #ffeeba; }
+        .word-bad { color: var(--orange); font-weight: bold; text-decoration: underline; cursor: pointer; margin: 0 4px; }
+        .word-good { color: var(--green); font-weight: bold; margin: 0 4px; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(0.97); } 100% { transform: scale(1); } }
+        .cert { display: none; text-align: center; border: 10px double #d4af37; padding: 40px 20px; margin-top: 30px; background: #fff; position: relative; }
+        .cert h2 { color: #b8860b; }
+        .stars { font-size: 40px; color: #f1c40f; margin: 10px 0; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🎤 English AI Dialogue Master</h1>
+
+    <div class="setup-box">
+        <input id="stdName" placeholder="Nhập tên học sinh..." oninput="saveInfo()">
+        <label><b>Chọn chế độ:</b></label>
+        <select id="mode" onchange="initApp()">
+            <option value="ai-ask">Alex hỏi - Học sinh trả lời (20 Units)</option>
+            <option value="std-ask">Học sinh hỏi - Alex trả lời (Alex thông minh)</option>
+        </select>
+
+        <div id="unitSelectBox">
+            <label><b>Chọn Unit lớp 5:</b></label>
+            <select id="unitId" onchange="initApp()">
+                <option value="1">Unit 1: All about me</option>
+                <option value="2">Unit 2: Our homes</option>
+                <option value="3">Unit 3: My friends</option>
+                <option value="4">Unit 4: My free time</option>
+                <option value="5">Unit 5: My future job</option>
+                <option value="6">Unit 6: Our school facilities</option>
+                <option value="7">Unit 7: Our school activities</option>
+                <option value="8">Unit 8: Our school things</option>
+                <option value="9">Unit 9: Our outdoor activities</option>
+                <option value="10">Unit 10: Our summer holidays</option>
+                <option value="11">Unit 11: My family's holidays</option>
+                <option value="12">Unit 12: Festivals</option>
+                <option value="13">Unit 13: School festivals</option>
+                <option value="14">Unit 14: Staying healthy</option>
+                <option value="15">Unit 15: Health problems</option>
+                <option value="16">Unit 16: Seasons and weather</option>
+                <option value="17">Unit 17: Stories</option>
+                <option value="18">Unit 18: Landmarks</option>
+                <option value="19">Unit 19: My favorite places</option>
+                <option value="20">Unit 20: My summer plans</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="chat-box">
+        <div id="aiMsg" class="ai-msg">Hello! I'm Alex. Let's practice English!</div>
+        <div id="userMsg" class="user-msg">Bấm nút mic và nói...</div>
+    </div>
+
+    <button id="micBtn" class="btn-speak" onclick="startRecognition()">🎙 NHẤN ĐỂ NÓI VỚI ALEX</button>
+
+    <div id="feedback" class="feedback-area">
+        <b>Sửa lỗi (Bấm chữ màu cam để nghe lại):</b>
+        <div id="wordList" style="font-size: 20px; line-height: 2;"></div>
+    </div>
+
+    <div id="cert" class="cert">
+        <h2>CONGRATULATIONS!</h2>
+        <p>This is to certify that</p>
+        <h1 id="certName" style="margin: 10px 0; color: #1a237e;">STUDENT</h1>
+        <p>has successfully completed the English Dialogue</p>
+        <div class="stars">⭐⭐⭐⭐⭐</div>
+        <p style="font-weight: bold; color: var(--green);">You are an English Star! 🌟</p>
+        <div style="margin-top:30px; display: flex; justify-content: space-around;">
+            <span>Teacher: Kim Yen</span>
+            <span>Teacher: Ngoc Bich</span>
+        </div>
+    </div>
+</div>
+
+<audio id="clap" src="https://www.soundjay.com/human/applause-8.mp3"></audio>
+
+<script>
+// Dữ liệu 20 Unit lớp 5 đầy đủ Lesson 1 & 2
+const unitData = {
+    1: ["Can you tell me about yourself?", "Where do you live?", "What's your favourite colour?", "What's your favourite animal?", "What's your favourite food?"],
+    2: ["Do you live in this house?", "Do you live in this flat?", "What's your address?", "Who do you live with?"],
+    3: ["Where is your friend from?", "What nationality is she?", "What's she like?", "Is she friendly and clever?"],
+    4: ["What do you like doing in your free time?", "What do you do at the weekend?", "Do you like surfing the Internet?"],
+    5: ["What would you like to be in the future?", "Why would you like to be a teacher?", "Where would you like to work?"],
+    6: ["Where is the art room?", "How can I get to the computer room?", "Is the music room on the second floor?"],
+    7: ["What school activity do you like?", "Why do you like doing projects?", "Is solving maths problems fun?"],
+    8: ["Where are the crayons?", "Whose set square is this?", "Are the pencil sharpeners on the table?"],
+    9: ["Were you at the campsite last week?", "What did you do yesterday?", "Did you watch the fish at the aquarium?"],
+    10: ["Did you go to Ba Na Hills?", "What did you do there?", "Did you visit the old buildings?"],
+    11: ["Did you swim in the sea?", "What did your family do in Ha Long Bay?", "Did you eat seafood?"],
+    12: ["Will you make banh chung for Tet?", "Where will you go at Tet?", "Will you decorate your house?"],
+    13: ["What will you do on Children's Day?", "What food will you have at the party?", "What drinks will you have?"],
+    14: ["How do you stay healthy?", "How often do you do morning exercise?", "Do you eat healthy food?"],
+    15: ["What's the matter with you?", "Should I go to the dentist?", "What should I do for a headache?"],
+    16: ["How's the weather in Ha Noi in summer?", "What do you usually wear in winter?", "Is it cold in autumn?"],
+    17: ["Who are the main characters in the story?", "What is the fox like?", "How did the crow sing?"],
+    18: ["Where do you want to visit?", "How can I get to Dragon Bridge?", "Can I get there by bus?"],
+    19: ["What do you think of Hoi An Old Town?", "How far is it from Da Nang to Hoi An?"],
+    20: ["Where are you going to visit this summer?", "What are you going to do there?"]
+};
+
+// Thông tin Alex và logic trả lời
+const alexProfile = {
+    identity: "I'm Alex. I'm 11 years old. I'm a student in class 5/2 at Oxford Primary School.",
+    family: "There are four people in my family: my parents, my younger sister and me.",
+    responses: {
+        "name": "My name is Alex. Nice to meet you!",
+        "old": "I am 11 years old. We are in the same grade!",
+        "where": "I live in Oxford, England. It's a beautiful city.",
+        "family": "My family has 4 people: my parents, my sister and me.",
+        "job": "My father is a doctor and my mother is a teacher. I want to be a pilot.",
+        "school": "I study at Oxford Primary School in class 5/2.",
+        "favourite": "I love English and playing football. My favourite food is pizza.",
+        "weather": "In England, it's often cold and rainy. I like sunny days!",
+        "doing": "I'm talking to you! I'm practicing English.",
+        "tet": "I know Tet! It's a big festival in Vietnam. I like banh chung."
+    }
+};
+
+let currentStep = 0;
+let isRecording = false;
+let recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+recognition.lang = 'en-US';
+
+function saveInfo() { localStorage.setItem('name', document.getElementById('stdName').value); }
+
+function initApp() {
+    currentStep = 0;
+    document.getElementById('cert').style.display = 'none';
+    document.getElementById('feedback').style.display = 'none';
+    const mode = document.getElementById('mode').value;
+    document.getElementById('unitSelectBox').style.display = (mode === 'ai-ask') ? 'block' : 'none';
+    
+    let firstMsg = (mode === 'ai-ask') ? unitData[document.getElementById('unitId').value][0] : "Hi, I'm Alex from Oxford. How can I help you?";
+    document.getElementById('aiMsg').innerText = firstMsg;
+    speak(firstMsg);
+}
+
+function startRecognition() {
+    if(isRecording) return;
+    recognition.start();
+    isRecording = true;
+    document.getElementById('micBtn').classList.add('recording');
+    document.getElementById('micBtn').innerText = "🛑 ALEX ĐANG NGHE...";
+}
+
+recognition.onresult = (event) => {
+    let transcript = event.results[0][0].transcript;
+    let confidence = event.results[0][0].confidence;
+    document.getElementById('userMsg').innerText = transcript;
+    processResponse(transcript, confidence);
+};
+
+recognition.onend = () => {
+    isRecording = false;
+    document.getElementById('micBtn').classList.remove('recording');
+    document.getElementById('micBtn').innerText = "🎙 NHẤN ĐỂ NÓI VỚI ALEX";
+};
+
+function processResponse(text, conf) {
+    const mode = document.getElementById('mode').value;
+    let reply = "";
+
+    if(mode === 'ai-ask') {
+        const currentUnit = unitData[document.getElementById('unitId').value];
+        currentStep++;
+        if(currentStep < currentUnit.length) {
+            reply = currentUnit[currentStep];
+            setTimeout(() => { document.getElementById('aiMsg').innerText = reply; speak(reply); }, 1500);
+        } else {
+            setTimeout(showCertificate, 1500);
+        }
+    } else {
+        const lowText = text.toLowerCase();
+        reply = "That's interesting! Tell me more.";
+        for(let key in alexProfile.responses) {
+            if(lowText.includes(key)) { reply = alexProfile.responses[key]; break; }
+        }
+        if(lowText.includes("who are you") || lowText.includes("about yourself")) reply = alexProfile.identity;
+        
+        document.getElementById('aiMsg').innerText = reply;
+        speak(reply);
+        if(currentStep++ > 4) setTimeout(showCertificate, 3000);
+    }
+    showFeedback(text, conf);
+}
+
+function showFeedback(text, conf) {
+    document.getElementById('feedback').style.display = 'block';
+    let html = "";
+    text.split(" ").forEach(word => {
+        if(conf > 0.85) html += `<span class="word-good">${word}</span>`;
+        else html += `<span class="word-bad" onclick="speak('${word}')">${word}</span>`;
+    });
+    document.getElementById('wordList').innerHTML = html;
+}
+
+function speak(t) {
+    window.speechSynthesis.cancel();
+    let msg = new SpeechSynthesisUtterance(t);
+    msg.lang = 'en-GB';
+    msg.rate = 0.9;
+    window.speechSynthesis.speak(msg);
+}
+
+function showCertificate() {
+    document.getElementById('clap').play();
+    document.getElementById('cert').style.display = 'block';
+    document.getElementById('certName').innerText = document.getElementById('stdName').value || "Amazing Student";
+    document.getElementById('cert').scrollIntoView({behavior: 'smooth'});
+}
+
+window.onload = () => {
+    document.getElementById('stdName').value = localStorage.getItem('name') || "";
+    initApp();
+};
+</script>
+</body>
+</html>
